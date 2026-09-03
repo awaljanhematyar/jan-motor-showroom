@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Details | Jan Motor Showroom</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== TOP INFO BAR ===================== -->
+<div class="info-bar">
+  <div class="container info-bar-inner">
+    <div class="info-bar-contact">
+      <span>📞 +93 700 123 456</span>
+      <span>✉️ info@janmotorshowroom.com</span>
+    </div>
+    <span class="info-bar-tagline">Drive Your World</span>
+  </div>
+</div>
+
+<!-- ===================== NAVBAR ===================== -->
+<header class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="logo"><span class="logo-icon">🚘</span><span class="logo-text">Jan Motor<small>Showroom</small></span></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="cars.html">Cars</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#services">Services</a>
+      <a href="index.html#contact">Contact</a>
+      <div class="nav-actions">
+        <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        <a href="login.html" class="btn btn-accent nav-auth-btn">Login / Admin</a>
+      </div>
+    </nav>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section id="details-content">
+  <div class="container">
+    <div id="car-details-root">
+      <!-- Populated by JS -->
+      <div class="loading-state"><div class="spinner"></div><p>Loading car details...</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FULLSCREEN LIGHTBOX ===================== -->
+<div class="lightbox-overlay" id="lightbox-overlay">
+  <div class="lightbox-content">
+    <button type="button" class="lightbox-close" id="lightbox-close-btn" aria-label="Close">✕</button>
+    <img src="" alt="Full screen car image" id="lightbox-image">
+    <div class="lightbox-controls">
+      <button type="button" class="lightbox-nav-btn" id="lightbox-prev-btn" aria-label="Previous image">‹</button>
+      <span class="lightbox-counter" id="lightbox-counter">1 / 1</span>
+      <button type="button" class="lightbox-nav-btn" id="lightbox-next-btn" aria-label="Next image">›</button>
+    </div>
+  </div>
+</div>
+
+<section class="related-section" id="related-section" style="display:none;">
+  <div class="container">
+    <div class="section-header">
+      <h2>You Might Also Like</h2>
+      <p>Similar vehicles from our inventory.</p>
+    </div>
+    <div class="car-grid" id="related-cars-grid"></div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-col">
+      <h4>🚘 Jan Motor Showroom</h4>
+      <p>Your trusted partner for buying, selling, and servicing quality vehicles.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="cars.html">Cars</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li>Car Sales</li>
+        <li>Car Purchase</li>
+        <li>Car Repair</li>
+        <li>Inspection</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li>Kabul, Afghanistan</li>
+        <li>+93 700 123 456</li>
+        <li>info@janmotorshowroom.com</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom container">
+    &copy; <span class="current-year"></span> Jan Motor Showroom. All rights reserved.
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  function renderCarDetails() {
+    const params = new URLSearchParams(window.location.search);
+    const carId = params.get("id");
+    const car = getCarById(carId);
+    const root = document.getElementById("car-details-root");
+
+    if (!car) {
+      root.innerHTML = `
+        <div class="empty-state">
+          <p class="empty-state-icon">🚫</p>
+          <h2 style="margin-bottom:10px;">Car Not Found</h2>
+          <p>This car may have been removed or the link is incorrect.</p>
+          <a href="cars.html" class="btn btn-primary" style="margin-top:20px;">Browse All Cars</a>
+        </div>
+      `;
+      return;
+    }
+
+    document.title = `${car.brand} ${car.model} (${car.year}) | Jan Motor Showroom`;
+
+    // Photo count is always derived live from the car's actual images array
+    const photoCount = Array.isArray(car.images) ? car.images.length : 0;
+
+    root.innerHTML = `
+      <div class="details-grid">
+        <div class="details-gallery">
+          <div class="details-main-image" id="gallery-main-image">
+            <img src="${car.images[0]}" alt="${car.brand} ${car.model}" id="main-details-image">
+            ${photoCount > 1 ? `
+              <button type="button" class="gallery-nav-btn gallery-nav-prev" id="gallery-prev-btn" aria-label="Previous image">‹</button>
+              <button type="button" class="gallery-nav-btn gallery-nav-next" id="gallery-next-btn" aria-label="Next image">›</button>
+            ` : ""}
+            <span class="gallery-counter" id="gallery-counter">1 / ${photoCount}</span>
+          </div>
+          <div class="details-thumbs" id="details-thumbs"></div>
+        </div>
+        <div class="details-info">
+          <span class="${statusBadgeClass(car.status)}" style="position:static; display:inline-block; margin-bottom:10px;">${capitalize(car.status)}</span>
+          <h1>${car.brand} ${car.model}</h1>
+          <p style="color:var(--text-muted);">${car.year} • ${car.location} • 📷 ${photoCount} Photo${photoCount === 1 ? "" : "s"}</p>
+          <p class="details-price">${formatPrice(car.price)}</p>
+
+          <div class="details-specs">
+            <div class="details-spec-item"><span>Mileage</span><strong>${formatMileage(car.mileage)}</strong></div>
+            <div class="details-spec-item"><span>Fuel Type</span><strong>${car.fuel}</strong></div>
+            <div class="details-spec-item"><span>Transmission</span><strong>${car.transmission}</strong></div>
+            <div class="details-spec-item"><span>Engine</span><strong>${car.engine || "N/A"}</strong></div>
+            <div class="details-spec-item"><span>Color</span><strong>${car.color || "N/A"}</strong></div>
+            <div class="details-spec-item"><span>Location</span><strong>${car.location}</strong></div>
+          </div>
+
+          <h3 style="margin-bottom:8px; font-size:1rem;">Description</h3>
+          <p class="details-description">${car.description || "No description provided for this vehicle."}</p>
+
+          <div class="details-actions">
+            <a href="tel:+93700123456" class="btn btn-primary">📞 Call Seller</a>
+            <a href="https://wa.me/93700123456?text=${encodeURIComponent('Hi, I am interested in the ' + car.brand + ' ' + car.model + ' (' + car.year + ') listed on Jan Motor Showroom.')}" target="_blank" rel="noopener" class="btn btn-success">💬 WhatsApp</a>
+            <a href="index.html#contact" class="btn btn-outline">✉️ Contact Us</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    initGallery(car);
+
+    // Related cars: same brand, excluding current, limit 4 — fallback to any other cars
+    let related = getCars().filter(c => c.id !== car.id && c.brand === car.brand);
+    if (related.length < 4) {
+      const others = getCars().filter(c => c.id !== car.id && !related.includes(c));
+      related = related.concat(others).slice(0, 4);
+    } else {
+      related = related.slice(0, 4);
+    }
+
+    if (related.length) {
+      document.getElementById("related-section").style.display = "block";
+      renderCarGrid(document.getElementById("related-cars-grid"), related);
+    }
+  }
+
+  /* ------------------------------------------------------------
+     GALLERY — thumbnails, prev/next navigation, image counter,
+     and a fullscreen lightbox. Works with any number of images.
+     ------------------------------------------------------------ */
+  let galleryImages = [];
+  let galleryIndex = 0;
+
+  function initGallery(car) {
+    galleryImages = car.images;
+    galleryIndex = 0;
+
+    const thumbsWrap = document.getElementById("details-thumbs");
+    thumbsWrap.innerHTML = "";
+    galleryImages.forEach((img, i) => {
+      const thumb = document.createElement("img");
+      thumb.src = img;
+      thumb.alt = `${car.brand} ${car.model} image ${i + 1}`;
+      if (i === 0) thumb.classList.add("active");
+      thumb.addEventListener("click", () => showGalleryImage(i));
+      thumbsWrap.appendChild(thumb);
+    });
+
+    const prevBtn = document.getElementById("gallery-prev-btn");
+    const nextBtn = document.getElementById("gallery-next-btn");
+    if (prevBtn) prevBtn.addEventListener("click", () => showGalleryImage(galleryIndex - 1));
+    if (nextBtn) nextBtn.addEventListener("click", () => showGalleryImage(galleryIndex + 1));
+
+    // Clicking the main image opens the fullscreen lightbox
+    document.getElementById("main-details-image").addEventListener("click", () => openLightbox(galleryIndex));
+  }
+
+  function showGalleryImage(index) {
+    if (!galleryImages.length) return;
+    galleryIndex = (index + galleryImages.length) % galleryImages.length;
+
+    document.getElementById("main-details-image").src = galleryImages[galleryIndex];
+    const counter = document.getElementById("gallery-counter");
+    if (counter) counter.textContent = `${galleryIndex + 1} / ${galleryImages.length}`;
+
+    document.querySelectorAll("#details-thumbs img").forEach((t, i) => {
+      t.classList.toggle("active", i === galleryIndex);
+    });
+  }
+
+  /* Fullscreen lightbox */
+  function openLightbox(index) {
+    galleryIndex = index;
+    document.getElementById("lightbox-image").src = galleryImages[galleryIndex];
+    document.getElementById("lightbox-counter").textContent = `${galleryIndex + 1} / ${galleryImages.length}`;
+    document.getElementById("lightbox-overlay").classList.add("lightbox-visible");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    document.getElementById("lightbox-overlay").classList.remove("lightbox-visible");
+    document.body.style.overflow = "";
+  }
+
+  function lightboxStep(delta) {
+    galleryIndex = (galleryIndex + delta + galleryImages.length) % galleryImages.length;
+    document.getElementById("lightbox-image").src = galleryImages[galleryIndex];
+    document.getElementById("lightbox-counter").textContent = `${galleryIndex + 1} / ${galleryImages.length}`;
+    showGalleryImage(galleryIndex);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    renderCarDetails();
+
+    document.getElementById("lightbox-close-btn").addEventListener("click", closeLightbox);
+    document.getElementById("lightbox-overlay").addEventListener("click", (e) => {
+      if (e.target.id === "lightbox-overlay") closeLightbox();
+    });
+    document.getElementById("lightbox-prev-btn").addEventListener("click", () => lightboxStep(-1));
+    document.getElementById("lightbox-next-btn").addEventListener("click", () => lightboxStep(1));
+
+    document.addEventListener("keydown", (e) => {
+      if (!document.getElementById("lightbox-overlay").classList.contains("lightbox-visible")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") lightboxStep(-1);
+      if (e.key === "ArrowRight") lightboxStep(1);
+    });
+  });
+</script>
+</body>
+</html>

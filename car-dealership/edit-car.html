@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Cars | Jan Motor Showroom Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sidebar-overlay"></div>
+
+  <aside class="admin-sidebar">
+    <a href="index.html" class="logo"><span class="logo-icon">🚘</span><span class="logo-text">Jan Motor<small>Showroom</small></span></a>
+    <a href="dashboard.html" class="sidebar-link">📊 Dashboard</a>
+    <a href="cars.html" class="sidebar-link">🚘 View Site Cars</a>
+    <a href="add-car.html" class="sidebar-link">➕ Add Car</a>
+    <a href="edit-car.html" class="sidebar-link active">🗂️ Manage Cars</a>
+    <a href="sales.html" class="sidebar-link">💰 Sales</a>
+    <a href="repairs.html" class="sidebar-link">🔧 Repairs</a>
+    <a href="#" class="sidebar-link logout-link" id="logout-btn">🚪 Logout</a>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <button class="sidebar-toggle" aria-label="Open sidebar">☰</button>
+      <h1 id="page-title">Manage Cars</h1>
+      <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+
+    <!-- ===================== LIST VIEW ===================== -->
+    <div class="panel" id="list-view">
+      <div class="panel-header">
+        <h2>All Cars (<span id="car-count">0</span>)</h2>
+        <a href="add-car.html" class="btn btn-primary btn-sm">➕ Add New Car</a>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Image</th><th>Brand</th><th>Model</th><th>Year</th><th>Price</th><th>Photos</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="cars-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===================== EDIT FORM VIEW (hidden until a car is selected) ===================== -->
+    <div class="panel" id="edit-view" style="display:none;">
+      <div class="panel-header">
+        <h2>Edit Car</h2>
+        <button class="btn btn-outline btn-sm" id="back-to-list-btn">← Back to List</button>
+      </div>
+      <form id="edit-car-form" novalidate>
+        <input type="hidden" id="edit-car-id">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Car Title <span class="required">*</span></label>
+            <input type="text" class="form-control" name="title" required>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" name="status">
+              <option value="available">Available</option>
+              <option value="sold">Sold</option>
+              <option value="repair">Under Repair</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Brand <span class="required">*</span></label>
+            <input type="text" class="form-control" name="brand" required>
+          </div>
+          <div class="form-group">
+            <label>Model <span class="required">*</span></label>
+            <input type="text" class="form-control" name="model" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Year <span class="required">*</span></label>
+            <input type="number" class="form-control" name="year" required>
+          </div>
+          <div class="form-group">
+            <label>Price (USD) <span class="required">*</span></label>
+            <input type="number" class="form-control" name="price" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Mileage (mi) <span class="required">*</span></label>
+            <input type="number" class="form-control" name="mileage" required>
+          </div>
+          <div class="form-group">
+            <label>Color</label>
+            <input type="text" class="form-control" name="color">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fuel Type <span class="required">*</span></label>
+            <select class="form-control" name="fuel" required>
+              <option value="">Select fuel type</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="Electric">Electric</option>
+              <option value="CNG">CNG</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Transmission <span class="required">*</span></label>
+            <select class="form-control" name="transmission" required>
+              <option value="">Select transmission</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+              <option value="CVT">CVT</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Engine</label>
+            <input type="text" class="form-control" name="engine">
+          </div>
+          <div class="form-group">
+            <label>Location <span class="required">*</span></label>
+            <input type="text" class="form-control" name="location" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea class="form-control" name="description"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Add More Images</label>
+          <input type="file" class="form-control" id="edit-images-input" accept="image/*" multiple>
+          <p class="form-help">Existing images are kept unless removed below. New selections are added to the gallery.</p>
+          <div class="image-upload-preview" id="edit-image-preview"></div>
+        </div>
+        <div style="display:flex; gap:12px; margin-top: 10px;">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" class="btn btn-outline" id="cancel-edit-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+
+<!-- ===================== DELETE CONFIRM MODAL ===================== -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-box">
+    <h3>Delete Car?</h3>
+    <p>This will permanently remove the car and any related sales/repair records. This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="cancel-delete-btn">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  let carPendingDelete = null;
+  let editImages = [];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    requireAuth();
+
+    document.getElementById("logout-btn").addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+      window.location.href = "login.html";
+    });
+
+    renderCarsTable();
+
+    document.getElementById("back-to-list-btn").addEventListener("click", showListView);
+    document.getElementById("cancel-edit-btn").addEventListener("click", showListView);
+    document.getElementById("edit-car-form").addEventListener("submit", handleEditSubmit);
+    document.getElementById("edit-images-input").addEventListener("change", handleEditImageSelection);
+
+    document.getElementById("cancel-delete-btn").addEventListener("click", closeDeleteModal);
+    document.getElementById("confirm-delete-btn").addEventListener("click", confirmDelete);
+  });
+
+  function renderCarsTable() {
+    const cars = getCars();
+    document.getElementById("car-count").textContent = cars.length;
+    const body = document.getElementById("cars-table-body");
+
+    if (!cars.length) {
+      body.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:30px;">No cars found. <a href="add-car.html">Add your first car</a>.</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = cars.map(car => `
+      <tr>
+        <td><img src="${car.images[0]}" class="table-thumb" alt="${car.brand}"></td>
+        <td>${car.brand}</td>
+        <td>${car.model}</td>
+        <td>${car.year}</td>
+        <td>${formatPrice(car.price)}</td>
+        <td>📷 ${Array.isArray(car.images) ? car.images.length : 0}</td>
+        <td>
+          <select class="select-status" data-car-id="${car.id}" onchange="handleStatusChange(this)">
+            <option value="available" ${car.status === "available" ? "selected" : ""}>Available</option>
+            <option value="sold" ${car.status === "sold" ? "selected" : ""}>Sold</option>
+            <option value="repair" ${car.status === "repair" ? "selected" : ""}>Under Repair</option>
+          </select>
+        </td>
+        <td>
+          <div class="table-actions">
+            <button class="btn btn-outline btn-sm" onclick="openEditView(${car.id})">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${car.id})">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function handleStatusChange(select) {
+    const carId = select.getAttribute("data-car-id");
+    const newStatus = select.value;
+    updateCar(carId, { status: newStatus });
+    showToast("Car status updated.", "success");
+    renderCarsTable();
+  }
+
+  function openEditView(carId) {
+    const car = getCarById(carId);
+    if (!car) return;
+
+    document.getElementById("edit-car-id").value = car.id;
+    const form = document.getElementById("edit-car-form");
+    form.title.value = car.title;
+    form.status.value = car.status;
+    form.brand.value = car.brand;
+    form.model.value = car.model;
+    form.year.value = car.year;
+    form.price.value = car.price;
+    form.mileage.value = car.mileage;
+    form.color.value = car.color || "";
+    form.fuel.value = car.fuel;
+    form.transmission.value = car.transmission;
+    form.engine.value = car.engine || "";
+    form.location.value = car.location;
+    form.description.value = car.description || "";
+
+    editImages = [...car.images];
+    renderEditImagePreview();
+
+    document.getElementById("list-view").style.display = "none";
+    document.getElementById("edit-view").style.display = "block";
+    document.getElementById("page-title").textContent = `Edit: ${car.brand} ${car.model}`;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showListView() {
+    document.getElementById("list-view").style.display = "block";
+    document.getElementById("edit-view").style.display = "none";
+    document.getElementById("page-title").textContent = "Manage Cars";
+    renderCarsTable();
+  }
+
+  function renderEditImagePreview() {
+    const preview = document.getElementById("edit-image-preview");
+    preview.innerHTML = editImages.map((img, i) => `
+      <div class="preview-thumb">
+        <img src="${img}" alt="car image">
+        ${i === 0 ? '<span class="preview-main-badge">Main</span>' : ""}
+        <span class="preview-remove" onclick="removeEditImage(${i})" title="Remove image">✕</span>
+      </div>
+    `).join("");
+  }
+
+  function removeEditImage(index) {
+    if (editImages.length <= 1) {
+      showToast("A car must have at least one image.", "error");
+      return;
+    }
+    editImages.splice(index, 1);
+    renderEditImagePreview();
+  }
+
+  function handleEditImageSelection(e) {
+    const files = Array.from(e.target.files);
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        editImages.push(event.target.result);
+        renderEditImagePreview();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function handleEditSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+
+    const requiredFields = form.querySelectorAll("[required]");
+    let valid = true;
+    requiredFields.forEach((field) => {
+      if (!field.value || !field.checkValidity()) {
+        field.classList.add("invalid");
+        valid = false;
+      } else {
+        field.classList.remove("invalid");
+      }
+    });
+
+    if (!valid) {
+      showToast("Please fill in all required fields.", "error");
+      return;
+    }
+
+    const carId = document.getElementById("edit-car-id").value;
+    const formData = new FormData(form);
+
+    updateCar(carId, {
+      title: formData.get("title").trim(),
+      status: formData.get("status"),
+      brand: formData.get("brand").trim(),
+      model: formData.get("model").trim(),
+      year: Number(formData.get("year")),
+      price: Number(formData.get("price")),
+      mileage: Number(formData.get("mileage")),
+      color: formData.get("color").trim(),
+      fuel: formData.get("fuel"),
+      transmission: formData.get("transmission"),
+      engine: formData.get("engine").trim(),
+      location: formData.get("location").trim(),
+      description: formData.get("description").trim(),
+      images: editImages
+    });
+
+    showToast("Car updated successfully!", "success");
+    showListView();
+  }
+
+  function openDeleteModal(carId) {
+    carPendingDelete = carId;
+    document.getElementById("delete-modal").classList.add("modal-visible");
+  }
+
+  function closeDeleteModal() {
+    carPendingDelete = null;
+    document.getElementById("delete-modal").classList.remove("modal-visible");
+  }
+
+  function confirmDelete() {
+    if (carPendingDelete !== null) {
+      deleteCar(carPendingDelete);
+      showToast("Car deleted.", "success");
+      renderCarsTable();
+    }
+    closeDeleteModal();
+  }
+</script>
+</body>
+</html>

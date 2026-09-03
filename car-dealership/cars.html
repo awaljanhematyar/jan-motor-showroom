@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browse Cars | Jan Motor Showroom</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== TOP INFO BAR ===================== -->
+<div class="info-bar">
+  <div class="container info-bar-inner">
+    <div class="info-bar-contact">
+      <span>📞 +93 700 123 456</span>
+      <span>✉️ info@janmotorshowroom.com</span>
+    </div>
+    <span class="info-bar-tagline">Drive Your World</span>
+  </div>
+</div>
+
+<!-- ===================== NAVBAR ===================== -->
+<header class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="logo"><span class="logo-icon">🚘</span><span class="logo-text">Jan Motor<small>Showroom</small></span></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="cars.html" class="active">Cars</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#services">Services</a>
+      <a href="index.html#contact">Contact</a>
+      <div class="nav-actions">
+        <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        <a href="login.html" class="btn btn-accent nav-auth-btn">Login / Admin</a>
+      </div>
+    </nav>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ===================== PAGE HEADER ===================== -->
+<div class="page-header">
+  <div class="container">
+    <h1>Browse Our Inventory</h1>
+    <p>Use search and filters below to find the car that's right for you.</p>
+  </div>
+</div>
+
+<section style="padding-top: 36px;">
+  <div class="container">
+
+    <!-- ===================== FILTERS BAR ===================== -->
+    <div class="filters-bar">
+      <div class="filters-search">
+        <input type="text" id="search-input" class="form-control" placeholder="🔍 Search by title, brand, or model...">
+      </div>
+      <div class="filters-grid">
+        <select id="filter-brand" class="form-control">
+          <option value="">All Brands</option>
+        </select>
+        <select id="filter-model" class="form-control">
+          <option value="">All Models</option>
+        </select>
+        <select id="filter-year" class="form-control">
+          <option value="">All Years</option>
+        </select>
+        <input type="number" id="filter-min-price" class="form-control" placeholder="Min Price">
+        <input type="number" id="filter-max-price" class="form-control" placeholder="Max Price">
+        <select id="filter-location" class="form-control">
+          <option value="">All Locations</option>
+        </select>
+        <select id="filter-fuel" class="form-control">
+          <option value="">All Fuel Types</option>
+        </select>
+        <select id="filter-transmission" class="form-control">
+          <option value="">All Transmissions</option>
+        </select>
+        <select id="filter-status" class="form-control">
+          <option value="">All Statuses</option>
+          <option value="available">Available</option>
+          <option value="sold">Sold</option>
+          <option value="repair">Under Repair</option>
+        </select>
+        <select id="sort-by" class="form-control">
+          <option value="">Sort By</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="year-desc">Year: Newest</option>
+          <option value="year-asc">Year: Oldest</option>
+        </select>
+      </div>
+      <div class="filters-actions">
+        <span class="results-count" id="results-count">Showing all cars</span>
+        <button class="btn btn-outline btn-sm" id="clear-filters-btn">Clear All Filters</button>
+      </div>
+    </div>
+
+    <!-- ===================== CAR GRID ===================== -->
+    <div class="car-grid" id="cars-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-col">
+      <h4>🚘 Jan Motor Showroom</h4>
+      <p>Your trusted partner for buying, selling, and servicing quality vehicles.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="cars.html">Cars</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li>Car Sales</li>
+        <li>Car Purchase</li>
+        <li>Car Repair</li>
+        <li>Inspection</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li>Kabul, Afghanistan</li>
+        <li>+93 700 123 456</li>
+        <li>info@janmotorshowroom.com</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom container">
+    &copy; <span class="current-year"></span> Jan Motor Showroom. All rights reserved.
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  /* ------------------------------------------------------------
+     CARS PAGE LOGIC — search, filter, sort
+     ------------------------------------------------------------ */
+  let allCars = [];
+
+  function populateFilterOptions() {
+    const brands = [...new Set(allCars.map(c => c.brand))].sort();
+    const models = [...new Set(allCars.map(c => c.model))].sort();
+    const years = [...new Set(allCars.map(c => c.year))].sort((a, b) => b - a);
+    const locations = [...new Set(allCars.map(c => c.location))].sort();
+    const fuels = [...new Set(allCars.map(c => c.fuel))].sort();
+    const transmissions = [...new Set(allCars.map(c => c.transmission))].sort();
+
+    fillSelect("filter-brand", brands);
+    fillSelect("filter-model", models);
+    fillSelect("filter-year", years);
+    fillSelect("filter-location", locations);
+    fillSelect("filter-fuel", fuels);
+    fillSelect("filter-transmission", transmissions);
+  }
+
+  function fillSelect(id, values) {
+    const select = document.getElementById(id);
+    values.forEach(val => {
+      const opt = document.createElement("option");
+      opt.value = val;
+      opt.textContent = val;
+      select.appendChild(opt);
+    });
+  }
+
+  function applyFiltersAndRender() {
+    const searchTerm = document.getElementById("search-input").value.trim().toLowerCase();
+    const brand = document.getElementById("filter-brand").value;
+    const model = document.getElementById("filter-model").value;
+    const year = document.getElementById("filter-year").value;
+    const minPrice = parseFloat(document.getElementById("filter-min-price").value);
+    const maxPrice = parseFloat(document.getElementById("filter-max-price").value);
+    const location = document.getElementById("filter-location").value;
+    const fuel = document.getElementById("filter-fuel").value;
+    const transmission = document.getElementById("filter-transmission").value;
+    const status = document.getElementById("filter-status").value;
+    const sortBy = document.getElementById("sort-by").value;
+
+    let results = allCars.filter(car => {
+      const matchesSearch = !searchTerm ||
+        car.title.toLowerCase().includes(searchTerm) ||
+        car.brand.toLowerCase().includes(searchTerm) ||
+        car.model.toLowerCase().includes(searchTerm);
+
+      return (
+        matchesSearch &&
+        (!brand || car.brand === brand) &&
+        (!model || car.model === model) &&
+        (!year || String(car.year) === year) &&
+        (isNaN(minPrice) || car.price >= minPrice) &&
+        (isNaN(maxPrice) || car.price <= maxPrice) &&
+        (!location || car.location === location) &&
+        (!fuel || car.fuel === fuel) &&
+        (!transmission || car.transmission === transmission) &&
+        (!status || car.status === status)
+      );
+    });
+
+    switch (sortBy) {
+      case "price-asc": results.sort((a, b) => a.price - b.price); break;
+      case "price-desc": results.sort((a, b) => b.price - a.price); break;
+      case "year-desc": results.sort((a, b) => b.year - a.year); break;
+      case "year-asc": results.sort((a, b) => a.year - b.year); break;
+    }
+
+    document.getElementById("results-count").textContent =
+      `Showing ${results.length} of ${allCars.length} cars`;
+
+    renderCarGrid(document.getElementById("cars-grid"), results);
+  }
+
+  function initCarsPage() {
+    allCars = getCars();
+    populateFilterOptions();
+    renderCarGrid(document.getElementById("cars-grid"), allCars);
+    document.getElementById("results-count").textContent = `Showing all ${allCars.length} cars`;
+
+    const filterIds = [
+      "search-input", "filter-brand", "filter-model", "filter-year",
+      "filter-min-price", "filter-max-price", "filter-location",
+      "filter-fuel", "filter-transmission", "filter-status", "sort-by"
+    ];
+    filterIds.forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener("input", applyFiltersAndRender);
+      el.addEventListener("change", applyFiltersAndRender);
+    });
+
+    document.getElementById("clear-filters-btn").addEventListener("click", () => {
+      filterIds.forEach(id => document.getElementById(id).value = "");
+      applyFiltersAndRender();
+    });
+
+    // Deep-link support: the homepage hero search (and any other page) can
+    // link here with ?search=&brand=&maxPrice=&status= to pre-apply filters.
+    const params = new URLSearchParams(window.location.search);
+    let hasDeepLinkFilter = false;
+
+    if (params.get("search")) {
+      document.getElementById("search-input").value = params.get("search");
+      hasDeepLinkFilter = true;
+    }
+    if (params.get("brand")) {
+      document.getElementById("filter-brand").value = params.get("brand");
+      hasDeepLinkFilter = true;
+    }
+    if (params.get("maxPrice")) {
+      document.getElementById("filter-max-price").value = params.get("maxPrice");
+      hasDeepLinkFilter = true;
+    }
+    if (params.get("status")) {
+      document.getElementById("filter-status").value = params.get("status");
+      hasDeepLinkFilter = true;
+    }
+
+    if (hasDeepLinkFilter) {
+      applyFiltersAndRender();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", initCarsPage);
+</script>
+</body>
+</html>

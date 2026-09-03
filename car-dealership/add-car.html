@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Car | Jan Motor Showroom Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sidebar-overlay"></div>
+
+  <aside class="admin-sidebar">
+    <a href="index.html" class="logo"><span class="logo-icon">🚘</span><span class="logo-text">Jan Motor<small>Showroom</small></span></a>
+    <a href="dashboard.html" class="sidebar-link">📊 Dashboard</a>
+    <a href="cars.html" class="sidebar-link">🚘 View Site Cars</a>
+    <a href="add-car.html" class="sidebar-link active">➕ Add Car</a>
+    <a href="edit-car.html" class="sidebar-link">🗂️ Manage Cars</a>
+    <a href="sales.html" class="sidebar-link">💰 Sales</a>
+    <a href="repairs.html" class="sidebar-link">🔧 Repairs</a>
+    <a href="#" class="sidebar-link logout-link" id="logout-btn">🚪 Logout</a>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <button class="sidebar-toggle" aria-label="Open sidebar">☰</button>
+      <h1>Add New Car</h1>
+      <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+
+    <div class="panel">
+      <form id="add-car-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Car Title <span class="required">*</span></label>
+            <input type="text" class="form-control" name="title" placeholder="e.g. Toyota Corolla LE" required>
+            <p class="form-error">Car title is required.</p>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" name="status">
+              <option value="available">Available</option>
+              <option value="sold">Sold</option>
+              <option value="repair">Under Repair</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Brand <span class="required">*</span></label>
+            <input type="text" class="form-control" name="brand" placeholder="e.g. Toyota" required>
+            <p class="form-error">Brand is required.</p>
+          </div>
+          <div class="form-group">
+            <label>Model <span class="required">*</span></label>
+            <input type="text" class="form-control" name="model" placeholder="e.g. Corolla" required>
+            <p class="form-error">Model is required.</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Year <span class="required">*</span></label>
+            <input type="number" class="form-control" name="year" min="1950" max="2100" placeholder="e.g. 2022" required>
+            <p class="form-error">Enter a valid year.</p>
+          </div>
+          <div class="form-group">
+            <label>Price (USD) <span class="required">*</span></label>
+            <input type="number" class="form-control" name="price" min="0" step="1" placeholder="e.g. 18500" required>
+            <p class="form-error">Enter a valid price.</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Mileage (mi) <span class="required">*</span></label>
+            <input type="number" class="form-control" name="mileage" min="0" placeholder="e.g. 24500" required>
+            <p class="form-error">Enter a valid mileage.</p>
+          </div>
+          <div class="form-group">
+            <label>Color</label>
+            <input type="text" class="form-control" name="color" placeholder="e.g. White">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fuel Type <span class="required">*</span></label>
+            <select class="form-control" name="fuel" required>
+              <option value="">Select fuel type</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="Electric">Electric</option>
+              <option value="CNG">CNG</option>
+            </select>
+            <p class="form-error">Please select a fuel type.</p>
+          </div>
+          <div class="form-group">
+            <label>Transmission <span class="required">*</span></label>
+            <select class="form-control" name="transmission" required>
+              <option value="">Select transmission</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+              <option value="CVT">CVT</option>
+            </select>
+            <p class="form-error">Please select a transmission.</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Engine</label>
+            <input type="text" class="form-control" name="engine" placeholder="e.g. 1.8L I4">
+          </div>
+          <div class="form-group">
+            <label>Location <span class="required">*</span></label>
+            <input type="text" class="form-control" name="location" placeholder="e.g. Kabul" required>
+            <p class="form-error">Location is required.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea class="form-control" name="description" placeholder="Describe the vehicle's condition, features, and history..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Car Images</label>
+          <input type="file" class="form-control" id="car-images-input" accept="image/*" multiple>
+          <p class="form-help">Select multiple images at once (or add more later). The first image becomes the main photo shown on car cards. Hover a preview and click ✕ to remove it before saving. If none are selected, a placeholder image will be used.</p>
+          <div class="image-upload-preview" id="image-preview"></div>
+        </div>
+
+        <div style="display:flex; gap:12px; margin-top: 10px;">
+          <button type="submit" class="btn btn-primary">Save Car</button>
+          <a href="edit-car.html" class="btn btn-outline">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+
+<script src="script.js"></script>
+<script>
+  let uploadedImages = [];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    requireAuth();
+
+    document.getElementById("logout-btn").addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+      window.location.href = "login.html";
+    });
+
+    document.getElementById("car-images-input").addEventListener("change", handleImageSelection);
+    document.getElementById("add-car-form").addEventListener("submit", handleAddCarSubmit);
+  });
+
+  function handleImageSelection(e) {
+    const files = Array.from(e.target.files);
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        uploadedImages.push(event.target.result);
+        renderImagePreview();
+      };
+      reader.readAsDataURL(file);
+    });
+    // Reset the input so selecting the same file(s) again still fires "change"
+    e.target.value = "";
+  }
+
+  function renderImagePreview() {
+    const preview = document.getElementById("image-preview");
+    if (!uploadedImages.length) {
+      preview.innerHTML = "";
+      return;
+    }
+    preview.innerHTML = uploadedImages.map((img, i) => `
+      <div class="preview-thumb">
+        <img src="${img}" alt="Car image ${i + 1}">
+        ${i === 0 ? '<span class="preview-main-badge">Main</span>' : ""}
+        <span class="preview-remove" onclick="removeUploadedImage(${i})" title="Remove image">✕</span>
+      </div>
+    `).join("");
+  }
+
+  function removeUploadedImage(index) {
+    uploadedImages.splice(index, 1);
+    renderImagePreview();
+  }
+
+  function handleAddCarSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+
+    const requiredFields = form.querySelectorAll("[required]");
+    let valid = true;
+    requiredFields.forEach((field) => {
+      if (!field.value || !field.checkValidity()) {
+        field.classList.add("invalid");
+        valid = false;
+      } else {
+        field.classList.remove("invalid");
+      }
+    });
+
+    if (!valid) {
+      showToast("Please fill in all required fields.", "error");
+      return;
+    }
+
+    const formData = new FormData(form);
+    const carData = {
+      title: formData.get("title").trim(),
+      brand: formData.get("brand").trim(),
+      model: formData.get("model").trim(),
+      year: formData.get("year"),
+      price: formData.get("price"),
+      mileage: formData.get("mileage"),
+      color: formData.get("color").trim(),
+      fuel: formData.get("fuel"),
+      transmission: formData.get("transmission"),
+      engine: formData.get("engine").trim(),
+      location: formData.get("location").trim(),
+      description: formData.get("description").trim(),
+      status: formData.get("status"),
+      images: uploadedImages
+    };
+
+    addCar(carData);
+    showToast("Car added successfully!", "success");
+    setTimeout(() => window.location.href = "edit-car.html", 700);
+  }
+</script>
+</body>
+</html>

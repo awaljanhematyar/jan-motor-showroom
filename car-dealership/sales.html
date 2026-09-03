@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales | Jan Motor Showroom Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sidebar-overlay"></div>
+
+  <aside class="admin-sidebar">
+    <a href="index.html" class="logo"><span class="logo-icon">🚘</span><span class="logo-text">Jan Motor<small>Showroom</small></span></a>
+    <a href="dashboard.html" class="sidebar-link">📊 Dashboard</a>
+    <a href="cars.html" class="sidebar-link">🚘 View Site Cars</a>
+    <a href="add-car.html" class="sidebar-link">➕ Add Car</a>
+    <a href="edit-car.html" class="sidebar-link">🗂️ Manage Cars</a>
+    <a href="sales.html" class="sidebar-link active">💰 Sales</a>
+    <a href="repairs.html" class="sidebar-link">🔧 Repairs</a>
+    <a href="#" class="sidebar-link logout-link" id="logout-btn">🚪 Logout</a>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <button class="sidebar-toggle" aria-label="Open sidebar">☰</button>
+      <h1>Sales Management</h1>
+      <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon purple">💰</div>
+        <div class="stat-info"><strong id="stat-total-revenue">$0</strong><span>Total Revenue</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">🏷️</div>
+        <div class="stat-info"><strong id="stat-total-sold">0</strong><span>Cars Sold</span></div>
+      </div>
+    </div>
+
+    <!-- ===================== NEW SALE FORM ===================== -->
+    <div class="panel">
+      <div class="panel-header"><h2>Record a New Sale</h2></div>
+      <form id="sale-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Select Car <span class="required">*</span></label>
+            <select class="form-control" id="sale-car-select" name="carId" required>
+              <option value="">Select an available car</option>
+            </select>
+            <p class="form-error">Please select a car.</p>
+          </div>
+          <div class="form-group">
+            <label>Customer Name <span class="required">*</span></label>
+            <input type="text" class="form-control" name="customerName" placeholder="e.g. Ahmad Rahimi" required>
+            <p class="form-error">Customer name is required.</p>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Sale Price (USD) <span class="required">*</span></label>
+            <input type="number" class="form-control" name="price" min="0" id="sale-price-input" required>
+            <p class="form-error">Enter a valid price.</p>
+          </div>
+          <div class="form-group">
+            <label>Sale Date <span class="required">*</span></label>
+            <input type="date" class="form-control" name="saleDate" required>
+            <p class="form-error">Please select a date.</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Payment Status</label>
+          <select class="form-control" name="paymentStatus">
+            <option value="paid">Paid</option>
+            <option value="pending">Pending</option>
+            <option value="partial">Partial</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Record Sale</button>
+      </form>
+    </div>
+
+    <!-- ===================== SALES TABLE ===================== -->
+    <div class="panel">
+      <div class="panel-header"><h2>All Sales (<span id="sales-count">0</span>)</h2></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Car</th><th>Customer</th><th>Price</th><th>Date</th><th>Payment</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="sales-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="script.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    requireAuth();
+
+    document.getElementById("logout-btn").addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+      window.location.href = "login.html";
+    });
+
+    document.querySelector('input[name="saleDate"]').valueAsDate = new Date();
+
+    populateCarSelect();
+    renderSalesData();
+
+    document.getElementById("sale-car-select").addEventListener("change", (e) => {
+      const car = getCarById(e.target.value);
+      if (car) document.getElementById("sale-price-input").value = car.price;
+    });
+
+    document.getElementById("sale-form").addEventListener("submit", handleSaleSubmit);
+  });
+
+  function populateCarSelect() {
+    const select = document.getElementById("sale-car-select");
+    const availableCars = getCars().filter(c => c.status === "available");
+    select.innerHTML = '<option value="">Select an available car</option>' +
+      availableCars.map(c => `<option value="${c.id}">${c.brand} ${c.model} (${c.year}) — ${formatPrice(c.price)}</option>`).join("");
+
+    if (!availableCars.length) {
+      select.innerHTML = '<option value="">No available cars to sell</option>';
+    }
+  }
+
+  function renderSalesData() {
+    const stats = calculateStatistics();
+    document.getElementById("stat-total-revenue").textContent = formatPrice(stats.totalSales);
+    document.getElementById("stat-total-sold").textContent = stats.soldCars;
+
+    const sales = getSales().slice().reverse();
+    document.getElementById("sales-count").textContent = sales.length;
+    const body = document.getElementById("sales-table-body");
+
+    if (!sales.length) {
+      body.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:30px;">No sales recorded yet.</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = sales.map(sale => {
+      const car = getCarById(sale.carId);
+      return `
+        <tr>
+          <td>${car ? car.brand + " " + car.model + " (" + car.year + ")" : "Deleted Car"}</td>
+          <td>${sale.customerName}</td>
+          <td>${formatPrice(sale.price)}</td>
+          <td>${sale.saleDate}</td>
+          <td>${capitalize(sale.paymentStatus)}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn btn-danger btn-sm" onclick="handleDeleteSale(${sale.id})">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function handleSaleSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+
+    const requiredFields = form.querySelectorAll("[required]");
+    let valid = true;
+    requiredFields.forEach((field) => {
+      if (!field.value) {
+        field.classList.add("invalid");
+        valid = false;
+      } else {
+        field.classList.remove("invalid");
+      }
+    });
+
+    if (!valid) {
+      showToast("Please fill in all required fields.", "error");
+      return;
+    }
+
+    const formData = new FormData(form);
+    addSale({
+      carId: formData.get("carId"),
+      customerName: formData.get("customerName").trim(),
+      price: formData.get("price"),
+      saleDate: formData.get("saleDate"),
+      paymentStatus: formData.get("paymentStatus")
+    });
+
+    showToast("Sale recorded! Car marked as sold.", "success");
+    form.reset();
+    document.querySelector('input[name="saleDate"]').valueAsDate = new Date();
+    populateCarSelect();
+    renderSalesData();
+  }
+
+  function handleDeleteSale(saleId) {
+    deleteSale(saleId);
+    showToast("Sale record deleted.", "success");
+    populateCarSelect();
+    renderSalesData();
+  }
+</script>
+</body>
+</html>

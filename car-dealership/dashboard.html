@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Jan Motor Showroom Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sidebar-overlay"></div>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="admin-sidebar">
+    <a href="index.html" class="logo"><span class="logo-icon">🚘</span><span class="logo-text">Jan Motor<small>Showroom</small></span></a>
+    <a href="dashboard.html" class="sidebar-link active">📊 Dashboard</a>
+    <a href="cars.html" class="sidebar-link">🚘 View Site Cars</a>
+    <a href="add-car.html" class="sidebar-link">➕ Add Car</a>
+    <a href="edit-car.html" class="sidebar-link" id="manage-cars-link">🗂️ Manage Cars</a>
+    <a href="sales.html" class="sidebar-link">💰 Sales</a>
+    <a href="repairs.html" class="sidebar-link">🔧 Repairs</a>
+    <a href="#" class="sidebar-link logout-link" id="logout-btn">🚪 Logout</a>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <button class="sidebar-toggle" aria-label="Open sidebar">☰</button>
+      <h1>Dashboard Overview</h1>
+      <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">🚗</div>
+        <div class="stat-info"><strong id="stat-total-cars">0</strong><span>Total Cars</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-info"><strong id="stat-available-cars">0</strong><span>Available Cars</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">🏷️</div>
+        <div class="stat-info"><strong id="stat-sold-cars">0</strong><span>Sold Cars</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">🔧</div>
+        <div class="stat-info"><strong id="stat-repair-cars">0</strong><span>Cars Under Repair</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">💰</div>
+        <div class="stat-info"><strong id="stat-total-sales">$0</strong><span>Total Sales Revenue</span></div>
+      </div>
+    </div>
+
+    <!-- RECENT CARS -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Recently Added Cars</h2>
+        <a href="edit-car.html" class="btn btn-outline btn-sm">Manage All Cars</a>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Image</th><th>Title</th><th>Brand</th><th>Year</th><th>Price</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recent-cars-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RECENT SALES -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Recent Sales</h2>
+        <a href="sales.html" class="btn btn-outline btn-sm">View All Sales</a>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Car</th><th>Customer</th><th>Price</th><th>Date</th><th>Payment</th></tr>
+          </thead>
+          <tbody id="recent-sales-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="script.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    requireAuth();
+
+    document.getElementById("logout-btn").addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+      window.location.href = "login.html";
+    });
+
+    loadDashboard();
+  });
+
+  function loadDashboard() {
+    const stats = calculateStatistics();
+    document.getElementById("stat-total-cars").textContent = stats.totalCars;
+    document.getElementById("stat-available-cars").textContent = stats.availableCars;
+    document.getElementById("stat-sold-cars").textContent = stats.soldCars;
+    document.getElementById("stat-repair-cars").textContent = stats.repairCars;
+    document.getElementById("stat-total-sales").textContent = formatPrice(stats.totalSales);
+
+    // Recent cars (last 5 added)
+    const cars = getCars().slice(0, 5); // getCars() is already newest-first
+    const carsBody = document.getElementById("recent-cars-body");
+    if (!cars.length) {
+      carsBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No cars yet. <a href="add-car.html">Add your first car</a>.</td></tr>`;
+    } else {
+      carsBody.innerHTML = cars.map(car => `
+        <tr>
+          <td><img src="${car.images[0]}" class="table-thumb" alt="${car.brand}"></td>
+          <td>${car.title}</td>
+          <td>${car.brand}</td>
+          <td>${car.year}</td>
+          <td>${formatPrice(car.price)}</td>
+          <td><span class="${statusBadgeClass(car.status)}" style="position:static; display:inline-block;">${capitalize(car.status)}</span></td>
+        </tr>
+      `).join("");
+    }
+
+    // Recent sales (last 5)
+    const sales = getSales().slice(-5).reverse();
+    const salesBody = document.getElementById("recent-sales-body");
+    if (!sales.length) {
+      salesBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No sales recorded yet.</td></tr>`;
+    } else {
+      salesBody.innerHTML = sales.map(sale => {
+        const car = getCarById(sale.carId);
+        return `
+          <tr>
+            <td>${car ? car.brand + " " + car.model : "Deleted Car"}</td>
+            <td>${sale.customerName}</td>
+            <td>${formatPrice(sale.price)}</td>
+            <td>${sale.saleDate}</td>
+            <td>${capitalize(sale.paymentStatus)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+  }
+</script>
+</body>
+</html>

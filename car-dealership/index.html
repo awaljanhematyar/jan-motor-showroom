@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jan Motor Showroom | Premium Car Dealership</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== TOP INFO BAR ===================== -->
+<div class="info-bar">
+  <div class="container info-bar-inner">
+    <div class="info-bar-contact">
+      <span>📞 +93 700 123 456</span>
+      <span>✉️ info@janmotorshowroom.com</span>
+    </div>
+    <span class="info-bar-tagline">Drive Your World</span>
+  </div>
+</div>
+
+<!-- ===================== NAVBAR ===================== -->
+<header class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="logo"><span class="logo-icon">🚘</span><span class="logo-text">Jan Motor<small>Showroom</small></span></a>
+
+    <nav class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="cars.html">Cars</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#services">Services</a>
+      <a href="index.html#contact">Contact</a>
+      <div class="nav-actions">
+        <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+        <a href="login.html" class="btn btn-accent nav-auth-btn">Login / Admin</a>
+      </div>
+    </nav>
+
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-content">
+      <span class="hero-badge"><span class="dot"></span> Trusted Showroom Since 2011</span>
+      <h1>Find Your Perfect Car.</h1>
+      <p>Discover, compare, and drive away in the perfect vehicle for every journey. Transparent pricing, inspected quality, and a showroom you can trust.</p>
+
+      <form class="hero-search-bar" id="hero-search-form">
+        <div class="hero-search-field">
+          <label for="hero-search-keyword">Keyword</label>
+          <input type="text" id="hero-search-keyword" placeholder="Search cars...">
+        </div>
+        <div class="hero-search-field">
+          <label for="hero-search-brand">Make</label>
+          <select id="hero-search-brand">
+            <option value="">Any Make</option>
+          </select>
+        </div>
+        <div class="hero-search-field">
+          <label for="hero-search-price">Budget</label>
+          <select id="hero-search-price">
+            <option value="">Any Price</option>
+            <option value="20000">Under $20,000</option>
+            <option value="30000">Under $30,000</option>
+            <option value="50000">Under $50,000</option>
+          </select>
+        </div>
+        <button type="submit" class="hero-search-btn" aria-label="Search cars">🔍</button>
+      </form>
+
+      <div class="hero-actions">
+        <a href="cars.html" class="btn btn-accent">🔍 Search Cars</a>
+        <a href="index.html#contact" class="btn btn-outline">Contact Us</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat"><strong id="hero-total-cars">50+</strong><span>Cars In Stock</span></div>
+        <div class="hero-stat"><strong>15+</strong><span>Years Experience</span></div>
+        <div class="hero-stat"><strong>4.9★</strong><span>Customer Rating</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-dot-pattern"></div>
+      <div class="hero-visual-frame">
+        <img src="https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1000&q=80" alt="Featured showroom vehicle">
+      </div>
+      <div class="hero-floating-card">
+        <span class="icon">🚗</span>
+        <div>
+          <strong id="hero-floating-count">50+ Cars</strong>
+          <span>Ready for a test drive</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FEATURED CARS ===================== -->
+<section id="featured-cars">
+  <div class="container">
+    <div class="section-header">
+      <h2>Featured Vehicles</h2>
+      <p>Hand-picked cars our team recommends this month.</p>
+    </div>
+    <div class="car-grid" id="featured-cars-grid">
+      <!-- Populated by JS -->
+    </div>
+    <div class="text-center" style="margin-top: 36px;">
+      <a href="cars.html" class="btn btn-outline">View All Cars</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SERVICES ===================== -->
+<section id="services" style="background-color: var(--surface-color);">
+  <div class="container">
+    <div class="section-header">
+      <h2>Our Services</h2>
+      <p>Everything you need for your vehicle, under one roof.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🚘</div>
+        <h3>Car Sales</h3>
+        <p>Explore our extensive inventory of new and pre-owned vehicles at competitive prices.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">💰</div>
+        <h3>Car Purchase</h3>
+        <p>We buy your car directly with a fair, transparent, and fast appraisal process.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🔧</div>
+        <h3>Car Repair</h3>
+        <p>Certified technicians handle everything from routine maintenance to major repairs.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">✅</div>
+        <h3>Vehicle Inspection</h3>
+        <p>Comprehensive multi-point inspections so you always know a car's true condition.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ABOUT ===================== -->
+<section id="about">
+  <div class="container about-inner">
+    <div class="about-image">
+      <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80" alt="Our dealership team">
+    </div>
+    <div class="about-content">
+      <div class="section-header" style="text-align:left; margin: 0 0 16px;">
+        <h2>About Jan Motor Showroom</h2>
+      </div>
+      <p>For over 15 years, Jan Motor Showroom has been a trusted name in the automotive industry, connecting buyers and sellers through honest pricing and quality service.</p>
+      <p>Our team of experienced advisors and certified mechanics ensures every car on our lot meets rigorous safety and quality standards before it reaches you.</p>
+      <ul class="about-list">
+        <li>Certified pre-owned inspection on every vehicle</li>
+        <li>Transparent, no-haggle pricing</li>
+        <li>In-house financing and trade-in options</li>
+        <li>Full-service repair and maintenance center</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONTACT ===================== -->
+<section id="contact" style="background-color: var(--surface-color);">
+  <div class="container">
+    <div class="section-header">
+      <h2>Get In Touch</h2>
+      <p>Have a question about a vehicle or our services? Reach out anytime.</p>
+    </div>
+    <div class="contact-inner">
+      <div class="contact-info">
+        <div class="contact-info-item">
+          <div class="icon">📍</div>
+          <div><h4>Visit Us</h4><p>Main Boulevard, District 5, Kabul, Afghanistan</p></div>
+        </div>
+        <div class="contact-info-item">
+          <div class="icon">📞</div>
+          <div><h4>Call Us</h4><p>+93 700 123 456</p></div>
+        </div>
+        <div class="contact-info-item">
+          <div class="icon">✉️</div>
+          <div><h4>Email Us</h4><p>info@janmotorshowroom.com</p></div>
+        </div>
+        <div class="contact-info-item">
+          <div class="icon">🕒</div>
+          <div><h4>Working Hours</h4><p>Sat – Thu: 9:00 AM – 6:00 PM</p></div>
+        </div>
+      </div>
+      <form class="form-card" id="contact-form">
+        <div class="form-group">
+          <label>Full Name <span class="required">*</span></label>
+          <input type="text" class="form-control" name="name" required>
+        </div>
+        <div class="form-group">
+          <label>Email <span class="required">*</span></label>
+          <input type="email" class="form-control" name="email" required>
+        </div>
+        <div class="form-group">
+          <label>Message <span class="required">*</span></label>
+          <textarea class="form-control" name="message" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-col">
+      <h4>🚘 Jan Motor Showroom</h4>
+      <p>Your trusted partner for buying, selling, and servicing quality vehicles.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="cars.html">Cars</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li>Car Sales</li>
+        <li>Car Purchase</li>
+        <li>Car Repair</li>
+        <li>Inspection</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li>Kabul, Afghanistan</li>
+        <li>+93 700 123 456</li>
+        <li>info@janmotorshowroom.com</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom container">
+    &copy; <span class="current-year"></span> Jan Motor Showroom. All rights reserved.
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  // Home page specific: render featured cars (newest-first, since getCars()
+  // is already sorted that way) and wire up the hero search bar.
+  document.addEventListener("DOMContentLoaded", () => {
+    const allCars = getCars();
+    const grid = document.getElementById("featured-cars-grid");
+    const featured = allCars.filter(c => c.status === "available").slice(0, 6);
+    renderCarGrid(grid, featured);
+
+    document.getElementById("hero-total-cars").textContent = allCars.length + "+";
+    document.getElementById("hero-floating-count").textContent = allCars.length + " Cars";
+
+    // Populate hero search "Make" dropdown from real inventory data
+    const brands = [...new Set(allCars.map(c => c.brand))].sort();
+    const brandSelect = document.getElementById("hero-search-brand");
+    brands.forEach(brand => {
+      const opt = document.createElement("option");
+      opt.value = brand;
+      opt.textContent = brand;
+      brandSelect.appendChild(opt);
+    });
+
+    // Hero search redirects to the full Cars page with filters pre-applied
+    document.getElementById("hero-search-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const keyword = document.getElementById("hero-search-keyword").value.trim();
+      const brand = document.getElementById("hero-search-brand").value;
+      const maxPrice = document.getElementById("hero-search-price").value;
+
+      const params = new URLSearchParams();
+      if (keyword) params.set("search", keyword);
+      if (brand) params.set("brand", brand);
+      if (maxPrice) params.set("maxPrice", maxPrice);
+
+      window.location.href = "cars.html" + (params.toString() ? "?" + params.toString() : "");
+    });
+
+    // Simple contact form handler (demo only, no backend)
+    document.getElementById("contact-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      showToast("Thanks! Your message has been sent (demo only).", "success");
+      e.target.reset();
+    });
+  });
+</script>
+</body>
+</html>

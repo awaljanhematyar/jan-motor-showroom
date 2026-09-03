@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repairs | Jan Motor Showroom Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div class="sidebar-overlay"></div>
+
+  <aside class="admin-sidebar">
+    <a href="index.html" class="logo"><span class="logo-icon">🚘</span><span class="logo-text">Jan Motor<small>Showroom</small></span></a>
+    <a href="dashboard.html" class="sidebar-link">📊 Dashboard</a>
+    <a href="cars.html" class="sidebar-link">🚘 View Site Cars</a>
+    <a href="add-car.html" class="sidebar-link">➕ Add Car</a>
+    <a href="edit-car.html" class="sidebar-link">🗂️ Manage Cars</a>
+    <a href="sales.html" class="sidebar-link">💰 Sales</a>
+    <a href="repairs.html" class="sidebar-link active">🔧 Repairs</a>
+    <a href="#" class="sidebar-link logout-link" id="logout-btn">🚪 Logout</a>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <button class="sidebar-toggle" aria-label="Open sidebar">☰</button>
+      <h1>Repair Management</h1>
+      <button class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon orange">🔧</div>
+        <div class="stat-info"><strong id="stat-cars-in-repair">0</strong><span>Cars Under Repair</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">⏳</div>
+        <div class="stat-info"><strong id="stat-pending-repairs">0</strong><span>Pending Repairs</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-info"><strong id="stat-completed-repairs">0</strong><span>Completed Repairs</span></div>
+      </div>
+    </div>
+
+    <!-- ===================== NEW REPAIR FORM ===================== -->
+    <div class="panel">
+      <div class="panel-header"><h2>Log a New Repair</h2></div>
+      <form id="repair-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Select Car <span class="required">*</span></label>
+            <select class="form-control" id="repair-car-select" name="carId" required>
+              <option value="">Select a car</option>
+            </select>
+            <p class="form-error">Please select a car.</p>
+          </div>
+          <div class="form-group">
+            <label>Repair Type <span class="required">*</span></label>
+            <input type="text" class="form-control" name="repairType" placeholder="e.g. Engine Service" required>
+            <p class="form-error">Repair type is required.</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea class="form-control" name="description" placeholder="Describe the issue and work needed..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Repair Cost (USD)</label>
+            <input type="number" class="form-control" name="cost" min="0">
+          </div>
+          <div class="form-group">
+            <label>Start Date <span class="required">*</span></label>
+            <input type="date" class="form-control" name="startDate" required>
+            <p class="form-error">Please select a start date.</p>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Log Repair</button>
+      </form>
+    </div>
+
+    <!-- ===================== REPAIRS TABLE ===================== -->
+    <div class="panel">
+      <div class="panel-header"><h2>All Repairs (<span id="repairs-count">0</span>)</h2></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Car</th><th>Type</th><th>Cost</th><th>Start Date</th><th>Completion</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="repairs-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="script.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    requireAuth();
+
+    document.getElementById("logout-btn").addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+      window.location.href = "login.html";
+    });
+
+    document.querySelector('input[name="startDate"]').valueAsDate = new Date();
+
+    populateRepairCarSelect();
+    renderRepairsData();
+
+    document.getElementById("repair-form").addEventListener("submit", handleRepairSubmit);
+  });
+
+  function populateRepairCarSelect() {
+    const select = document.getElementById("repair-car-select");
+    const cars = getCars();
+    select.innerHTML = '<option value="">Select a car</option>' +
+      cars.map(c => `<option value="${c.id}">${c.brand} ${c.model} (${c.year})</option>`).join("");
+  }
+
+  function renderRepairsData() {
+    const cars = getCars();
+    const repairs = getRepairs().slice().reverse();
+
+    document.getElementById("stat-cars-in-repair").textContent = cars.filter(c => c.status === "repair").length;
+    document.getElementById("stat-pending-repairs").textContent = repairs.filter(r => r.status === "pending").length;
+    document.getElementById("stat-completed-repairs").textContent = repairs.filter(r => r.status === "completed").length;
+
+    document.getElementById("repairs-count").textContent = repairs.length;
+    const body = document.getElementById("repairs-table-body");
+
+    if (!repairs.length) {
+      body.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:30px;">No repairs logged yet.</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = repairs.map(repair => {
+      const car = getCarById(repair.carId);
+      return `
+        <tr>
+          <td>${car ? car.brand + " " + car.model : "Deleted Car"}</td>
+          <td>${repair.repairType}</td>
+          <td>${repair.cost ? formatPrice(repair.cost) : "—"}</td>
+          <td>${repair.startDate}</td>
+          <td>${repair.completionDate || "—"}</td>
+          <td>
+            <select class="select-status" data-repair-id="${repair.id}" onchange="handleRepairStatusChange(this)">
+              <option value="pending" ${repair.status === "pending" ? "selected" : ""}>Pending</option>
+              <option value="in-repair" ${repair.status === "in-repair" ? "selected" : ""}>In Repair</option>
+              <option value="completed" ${repair.status === "completed" ? "selected" : ""}>Completed</option>
+            </select>
+          </td>
+          <td>
+            <div class="table-actions">
+              <button class="btn btn-danger btn-sm" onclick="handleDeleteRepair(${repair.id})">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function handleRepairStatusChange(select) {
+    const repairId = select.getAttribute("data-repair-id");
+    const newStatus = select.value;
+    const updates = { status: newStatus };
+    if (newStatus === "completed") {
+      updates.completionDate = new Date().toISOString().split("T")[0];
+    }
+    updateRepair(repairId, updates);
+    showToast(
+      newStatus === "completed"
+        ? "Repair marked complete — car is now available again."
+        : "Repair status updated.",
+      "success"
+    );
+    populateRepairCarSelect();
+    renderRepairsData();
+  }
+
+  function handleRepairSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+
+    const requiredFields = form.querySelectorAll("[required]");
+    let valid = true;
+    requiredFields.forEach((field) => {
+      if (!field.value) {
+        field.classList.add("invalid");
+        valid = false;
+      } else {
+        field.classList.remove("invalid");
+      }
+    });
+
+    if (!valid) {
+      showToast("Please fill in all required fields.", "error");
+      return;
+    }
+
+    const formData = new FormData(form);
+    addRepair({
+      carId: formData.get("carId"),
+      repairType: formData.get("repairType").trim(),
+      description: formData.get("description").trim(),
+      cost: formData.get("cost") || 0,
+      startDate: formData.get("startDate"),
+      status: "pending"
+    });
+
+    showToast("Repair logged! Car marked as under repair.", "success");
+    form.reset();
+    document.querySelector('input[name="startDate"]').valueAsDate = new Date();
+    populateRepairCarSelect();
+    renderRepairsData();
+  }
+
+  function handleDeleteRepair(repairId) {
+    deleteRepair(repairId);
+    showToast("Repair record deleted.", "success");
+    renderRepairsData();
+  }
+</script>
+</body>
+</html>
